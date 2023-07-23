@@ -25,7 +25,21 @@ namespace Transaction.Database.Repositories
         {
 
             var entities = _mapper.Map<List<CategoryEntity>>(categories);
-            await _dbContext.AddRangeAsync(entities);
+
+            foreach (var entity in entities)
+            {
+                var existingEntity = await _dbContext.Categories.FindAsync(entity.Code);
+
+                if (existingEntity != null)
+                {
+                    _dbContext.Entry(existingEntity).CurrentValues.SetValues(entity);
+                }
+                else
+                {
+                    await _dbContext.Categories.AddAsync(entity);
+                }
+            }
+
         }
 
         public async Task SaveAsync()
