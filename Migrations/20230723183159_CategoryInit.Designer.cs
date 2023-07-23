@@ -11,9 +11,9 @@ using Transaction.Database;
 
 namespace Finance.Migrations
 {
-    [DbContext(typeof(TransactionsDbContext))]
-    [Migration("20230724173143_InitDb")]
-    partial class InitDb
+    [DbContext(typeof(CategoriesDbContext))]
+    [Migration("20230725183159_CategoryInit")]
+    partial class CategoryInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,24 @@ namespace Finance.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ParentCode")
+                        .HasColumnType("text");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("Categories", (string)null);
+                });
 
             modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>
                 {
@@ -45,8 +63,8 @@ namespace Finance.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)

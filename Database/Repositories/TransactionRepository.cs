@@ -20,11 +20,6 @@ namespace Transaction.Database.Repositories
             return await _dbContext.Transactions.FirstOrDefaultAsync(p => p.Id == productCode);
         }
 
-        public Task<IEnumerable<TransactionEntity>> Import(IEnumerable<TransactionEntity> entities)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<PagedSortedList<TransactionEntity>> List(string transactionKind, DateTime? startDate, DateTime? endDate, string sortBy, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc)
         {
             var query = _dbContext.Transactions.AsQueryable();

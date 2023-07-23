@@ -8,14 +8,14 @@ namespace Transaction.Controllers
 {
     [Route("transactions")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
-        private readonly ILogger<ProductsController> _logger;
+        private readonly ILogger<TransactionController> _logger;
 
-        public ProductsController(ITransactionService productsService, ILogger<ProductsController> logger)
+        public TransactionController(ITransactionService transactionService, ILogger<TransactionController> logger)
         {
-            _transactionService = productsService;
+            _transactionService = transactionService;
             _logger = logger;
         }
 

@@ -7,6 +7,7 @@ using Transaction.Services;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Finance.Services;
 
 namespace Transaction
 {
@@ -21,9 +22,17 @@ namespace Transaction
             builder.Services.AddScoped<ITransactionService, TransactionService>();
             builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             builder.Services.AddDbContext<TransactionsDbContext>(options =>
+            {
+                options.UseNpgsql(CreateConnectionString(builder.Configuration));
+            });
+
+            builder.Services.AddDbContext<CategoriesDbContext>(options =>
             {
                 options.UseNpgsql(CreateConnectionString(builder.Configuration));
             });
