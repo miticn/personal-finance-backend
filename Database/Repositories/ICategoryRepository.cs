@@ -7,7 +7,7 @@ namespace Transaction.Database.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<CategoryEntity> Get(string productCode);
+        Task<CategoryEntity> Get(string code);
         Task AddTransactionsAsync(List<Category> transactions);
         Task SaveAsync();
     }

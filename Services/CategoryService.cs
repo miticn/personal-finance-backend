@@ -47,5 +47,30 @@ namespace Finance.Services
 
             return categories.ToList();
         }
+
+        public async Task<Category> GetTransaction(string id)
+        {
+            var productEntity = await _categoryRepository.Get(id);
+
+            if (productEntity == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<Models.Category>(productEntity);
+        }
+
+        public async Task<Category> GetCategory(string id)
+        {
+            var catEntity = await _categoryRepository.Get(id);
+
+            if (catEntity == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<Category>(catEntity);
+        }
+
     }
 }

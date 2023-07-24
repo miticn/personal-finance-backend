@@ -16,9 +16,9 @@ namespace Transaction.Database.Repositories
             _mapper = mapper;
         }
 
-        public async Task<CategoryEntity> Get(string productCode)
+        public async Task<CategoryEntity> Get(string code)
         {
-            return await _dbContext.Categories.FirstOrDefaultAsync(p => p.ParentCode == productCode);
+            return await _dbContext.Categories.FirstOrDefaultAsync(p => p.Code == code);
         }
 
         public async Task AddTransactionsAsync(List<Category> categories)

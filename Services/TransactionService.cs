@@ -22,16 +22,16 @@ namespace Transaction.Services
             _mapper = mapper;
         }
 
-        public async Task<Models.Transaction> GetProduct(string productCode)
+        public async Task<Models.Transaction> GetTransaction(string id)
         {
-            var productEntity = await _transactionRepository.Get(productCode);
+            var trEntity = await _transactionRepository.Get(id);
 
-            if (productEntity == null)
+            if (trEntity == null)
             {
                 return null;
             }
 
-            return _mapper.Map<Models.Transaction>(productEntity);
+            return _mapper.Map<Models.Transaction>(trEntity);
         }
 
         public async Task<List<Models.Transaction>> ParseCsv(string csvData)

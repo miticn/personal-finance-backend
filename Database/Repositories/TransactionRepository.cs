@@ -15,9 +15,9 @@ namespace Transaction.Database.Repositories
             _mapper = mapper;
         }
 
-        public async Task<TransactionEntity> Get(string productCode)
+        public async Task<TransactionEntity> Get(string id)
         {
-            return await _dbContext.Transactions.FirstOrDefaultAsync(p => p.Id == productCode);
+            return await _dbContext.Transactions.FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<PagedSortedList<TransactionEntity>> List(string transactionKind, DateTime? startDate, DateTime? endDate, string sortBy, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc)

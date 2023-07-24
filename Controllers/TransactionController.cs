@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Finance.Commands;
+using Finance.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Transaction.Database.Repositories;
 using Transaction.Models;
 using Transaction.Services;
 
@@ -11,12 +15,17 @@ namespace Transaction.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly ILogger<TransactionController> _logger;
+        private readonly ICategoryService _categoryService;
 
-        public TransactionController(ITransactionService transactionService, ILogger<TransactionController> logger)
+        public TransactionController(ITransactionService transactionService, ICategoryService categoryService,
+            ITransactionRepository transactionRepository, ILogger<TransactionController> logger)
         {
             _transactionService = transactionService;
+            _categoryService = categoryService;
             _logger = logger;
+            _transactionRepository = transactionRepository;
         }
 
         [HttpGet]
@@ -51,10 +60,41 @@ namespace Transaction.Controllers
                 return StatusCode(500, new { Error = "An unexpected error occurred." });
             }
         }
+        [HttpPost("{id}/categorize")]
+        public async Task<ActionResult> CategorizeTransaction(string id, [FromBody] TransactionCategorizeCommand categorizeCommand)
+        {
+            
+            var transaction = await _transactionRepository.Get(id);
+            var category = await _categoryService.GetCategory(categorizeCommand.catcode);
+
+            if (transaction == null)
+            {
+                return NotFound("Transaction not found");
+            }
+
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
+
+            transaction.Catcode = category.Code;
+
+            try
+            {
+                await _transactionRepository.SaveAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest("Error while saving changes");
+            }
+
+            return Ok("Transaction categorized");
+        }
+
         [HttpPost("{id}/split")]
         public async Task<IActionResult> GetProduct([FromRoute] string id)
         {
-            var product = await _transactionService.GetProduct(id);
+            var product = await _transactionService.GetTransaction(id);
 
             if (product == null)
             {
