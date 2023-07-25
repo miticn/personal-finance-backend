@@ -130,33 +130,33 @@ namespace Transaction.Database.Repositories
             var query2 = await query.GroupBy(t => t.Catcode)
                 .Select(g => new AnalyticsResult
                 {
-                    CategoryCode = g.Key,
-                    Count = g.Count(),
-                    Sum = g.Sum(t => t.Amount)
+                    catcode = g.Key,
+                    amount = g.Sum(t => t.Amount),
+                    count = g.Count()
                 }).ToListAsync();
 
             
 
-            var joined = query2.Join(catWithParents, t => t.CategoryCode, c => c.Code, (t, c) => new AnalyticsResult
+            var joined = query2.Join(catWithParents, t => t.catcode, c => c.Code, (t, c) => new AnalyticsResult
             {
-                CategoryCode = c.ParentCode,
-                Count = t.Count,
-                Sum = t.Sum
+                catcode = c.ParentCode,
+                amount = t.amount,
+                count = t.count
             }).Union(query2);
 
             //sum count and sum for same category
-            joined = joined.GroupBy(t => t.CategoryCode)
+            joined = joined.GroupBy(t => t.catcode)
                 .Select(g => new AnalyticsResult
                 {
-                    CategoryCode = g.Key,
-                    Count = g.Sum(t => t.Count),
-                    Sum = g.Sum(t => t.Sum)
+                    catcode = g.Key,
+                    amount = g.Sum(t => t.amount),
+                    count = g.Sum(t => t.count)
                 });
 
             //keep only toKeep
             if(toKeep.Count > 0)
             {
-                joined = joined.Where(t => toKeep.Contains(t.CategoryCode));
+                joined = joined.Where(t => toKeep.Contains(t.catcode));
             }
             return joined.ToList();
 
