@@ -12,7 +12,7 @@ using Transaction.Database;
 namespace Finance.Migrations
 {
     [DbContext(typeof(TransactionsDbContext))]
-    [Migration("20230727031955_InitDb")]
+    [Migration("20230727045814_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,15 +34,12 @@ namespace Finance.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ParentCategoryCode")
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("ParentCode")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Code");
 
-                    b.HasIndex("ParentCategoryCode");
+                    b.HasIndex("ParentCode");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -94,13 +91,33 @@ namespace Finance.Migrations
                     b.ToTable("Transactions", (string)null);
                 });
 
+            modelBuilder.Entity("Transaction.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("catcode")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<double>("amount")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("TransactionId", "catcode");
+
+                    b.HasIndex("catcode");
+
+                    b.ToTable("TransactionSplits", (string)null);
+                });
+
             modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
                 {
-                    b.HasOne("Finance.Models.CategoryEntity", "ParentCategory")
-                        .WithMany("SubCategories")
-                        .HasForeignKey("ParentCategoryCode");
+                    b.HasOne("Finance.Models.CategoryEntity", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentCode")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("ParentCategory");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>
@@ -112,9 +129,33 @@ namespace Finance.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Transaction.Database.Entities.TransactionSplitEntity", b =>
+                {
+                    b.HasOne("Transaction.Database.Entities.TransactionEntity", "Transaction")
+                        .WithMany("TransactionSplits")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Finance.Models.CategoryEntity", "Category")
+                        .WithMany()
+                        .HasForeignKey("catcode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
                 {
-                    b.Navigation("SubCategories");
+                    b.Navigation("Children");
+                });
+
+            modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>
+                {
+                    b.Navigation("TransactionSplits");
                 });
 #pragma warning restore 612, 618
         }

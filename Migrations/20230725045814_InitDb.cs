@@ -14,18 +14,18 @@ namespace Finance.Migrations
                 columns: table => new
                 {
                     Code = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ParentCode = table.Column<string>(type: "text", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    ParentCategoryCode = table.Column<string>(type: "character varying(100)", nullable: true)
+                    ParentCode = table.Column<string>(type: "character varying(100)", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Code);
                     table.ForeignKey(
-                        name: "FK_Categories_Categories_ParentCategoryCode",
-                        column: x => x.ParentCategoryCode,
+                        name: "FK_Categories_Categories_ParentCode",
+                        column: x => x.ParentCode,
                         principalTable: "Categories",
-                        principalColumn: "Code");
+                        principalColumn: "Code",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,19 +53,52 @@ namespace Finance.Migrations
                         principalColumn: "Code");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TransactionSplits",
+                columns: table => new
+                {
+                    TransactionId = table.Column<string>(type: "text", nullable: false),
+                    catcode = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    amount = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionSplits", x => new { x.TransactionId, x.catcode });
+                    table.ForeignKey(
+                        name: "FK_TransactionSplits_Categories_catcode",
+                        column: x => x.catcode,
+                        principalTable: "Categories",
+                        principalColumn: "Code",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TransactionSplits_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_ParentCategoryCode",
+                name: "IX_Categories_ParentCode",
                 table: "Categories",
-                column: "ParentCategoryCode");
+                column: "ParentCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_Catcode",
                 table: "Transactions",
                 column: "Catcode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionSplits_catcode",
+                table: "TransactionSplits",
+                column: "catcode");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "TransactionSplits");
+
             migrationBuilder.DropTable(
                 name: "Transactions");
 

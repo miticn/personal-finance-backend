@@ -19,5 +19,11 @@ public class CategoryEntityTypeConfiguration : IEntityTypeConfiguration<Category
            .IsRequired();
 
         builder.Property(t => t.ParentCode);
+
+        // Define self-referencing relationship
+        builder.HasOne(t => t.Parent)
+               .WithMany(t => t.Children)
+               .HasForeignKey(t => t.ParentCode)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

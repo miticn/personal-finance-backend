@@ -26,5 +26,6 @@ namespace Transaction.Database.Entities
         public string? Catcode { get; set; }
 
         public CategoryEntity Category { get; set; }
+        public virtual ICollection<TransactionSplitEntity> TransactionSplits { get; set; }
     }
 }
