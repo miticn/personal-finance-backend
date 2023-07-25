@@ -12,7 +12,7 @@ using Transaction.Database;
 namespace Finance.Migrations
 {
     [DbContext(typeof(TransactionsDbContext))]
-    [Migration("20230727021029_InitDb")]
+    [Migration("20230727031955_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,10 +34,15 @@ namespace Finance.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ParentCategoryCode")
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("ParentCode")
                         .HasColumnType("text");
 
                     b.HasKey("Code");
+
+                    b.HasIndex("ParentCategoryCode");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -56,7 +61,8 @@ namespace Finance.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Catcode")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Currency")
                         .IsRequired()
@@ -83,7 +89,32 @@ namespace Finance.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Catcode");
+
                     b.ToTable("Transactions", (string)null);
+                });
+
+            modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
+                {
+                    b.HasOne("Finance.Models.CategoryEntity", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryCode");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>
+                {
+                    b.HasOne("Finance.Models.CategoryEntity", "Category")
+                        .WithMany()
+                        .HasForeignKey("Catcode");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
+                {
+                    b.Navigation("SubCategories");
                 });
 #pragma warning restore 612, 618
         }

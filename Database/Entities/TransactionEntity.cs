@@ -1,4 +1,5 @@
-﻿using Transaction.Models;
+﻿using Finance.Models;
+using Transaction.Models;
 
 namespace Transaction.Database.Entities
 {
@@ -23,5 +24,7 @@ namespace Transaction.Database.Entities
         public TransactionKindsEnum Kind { get; set; }
 
         public string? Catcode { get; set; }
+
+        public CategoryEntity Category { get; set; }
     }
 }

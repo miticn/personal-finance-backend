@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Finance.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Transaction.Database.Entities;
 
@@ -35,5 +36,12 @@ public class TransactionEntityTypeConfiguration : IEntityTypeConfiguration<Trans
 
         builder.Property(t => t.Kind)
             .HasMaxLength(3);
+
+        builder.Property(t => t.Catcode)
+            .HasMaxLength(100);
+
+        builder.HasOne<CategoryEntity>(t => t.Category)
+            .WithMany()
+            .HasForeignKey(t => t.Catcode);
     }
 }

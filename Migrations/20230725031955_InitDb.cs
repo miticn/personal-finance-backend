@@ -15,11 +15,17 @@ namespace Finance.Migrations
                 {
                     Code = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ParentCode = table.Column<string>(type: "text", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    ParentCategoryCode = table.Column<string>(type: "character varying(100)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Code);
+                    table.ForeignKey(
+                        name: "FK_Categories_Categories_ParentCategoryCode",
+                        column: x => x.ParentCategoryCode,
+                        principalTable: "Categories",
+                        principalColumn: "Code");
                 });
 
             migrationBuilder.CreateTable(
@@ -35,21 +41,36 @@ namespace Finance.Migrations
                     Currency = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false),
                     MCC = table.Column<int>(type: "integer", nullable: true),
                     Kind = table.Column<int>(type: "integer", maxLength: 3, nullable: false),
-                    Catcode = table.Column<string>(type: "text", nullable: true)
+                    Catcode = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Categories_Catcode",
+                        column: x => x.Catcode,
+                        principalTable: "Categories",
+                        principalColumn: "Code");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_ParentCategoryCode",
+                table: "Categories",
+                column: "ParentCategoryCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_Catcode",
+                table: "Transactions",
+                column: "Catcode");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Transactions");
 
             migrationBuilder.DropTable(
-                name: "Transactions");
+                name: "Categories");
         }
     }
 }
