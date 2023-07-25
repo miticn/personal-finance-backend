@@ -32,11 +32,6 @@ namespace Transaction
                 options.UseNpgsql(CreateConnectionString(builder.Configuration));
             });
 
-            builder.Services.AddDbContext<CategoriesDbContext>(options =>
-            {
-                options.UseNpgsql(CreateConnectionString(builder.Configuration));
-            });
-
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));

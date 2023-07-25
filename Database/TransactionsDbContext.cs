@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Transaction.Database.Entities;
 using System.Reflection;
+using Finance.Models;
 
 namespace Transaction.Database
 {
     public class TransactionsDbContext: DbContext
     {
         public DbSet<TransactionEntity> Transactions { get; set; }
-
+        public DbSet<CategoryEntity> Categories { get; set; }
         public TransactionsDbContext()
         {
 

@@ -8,9 +8,9 @@ namespace Transaction.Database.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private readonly CategoriesDbContext _dbContext;
+        private readonly TransactionsDbContext _dbContext;
         private readonly IMapper _mapper;
-        public CategoryRepository(CategoriesDbContext dbContext, IMapper mapper)
+        public CategoryRepository(TransactionsDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;

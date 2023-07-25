@@ -9,12 +9,10 @@ namespace Transaction.Database.Repositories
     public class TransactionRepository : ITransactionRepository
     {
         private readonly TransactionsDbContext _dbContext;
-        private readonly CategoriesDbContext _dbContextCat;
         private readonly IMapper _mapper;
-        public TransactionRepository(TransactionsDbContext dbContext, CategoriesDbContext dbContextCat, IMapper mapper)
+        public TransactionRepository(TransactionsDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
-            _dbContextCat = dbContextCat;
             _mapper = mapper;
         }
 
@@ -95,7 +93,7 @@ namespace Transaction.Database.Repositories
         public async Task<List<AnalyticsResult>> GetAnalytics(string? catcode, DateTime? startDate, DateTime? endDate, string? direction)
         {
             var query = _dbContext.Transactions.AsQueryable();
-            var catWithParents = await _dbContextCat.Categories.Where(e => e.ParentCode != null && e.ParentCode!= "").ToListAsync();
+            var catWithParents = await _dbContext.Categories.Where(e => e.ParentCode != null && e.ParentCode!= "").ToListAsync();
 
             if (startDate != null && (endDate != null))
                 query = query.Where(t => t.Date >= startDate && t.Date <= endDate);
