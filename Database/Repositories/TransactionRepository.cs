@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Finance.Models;
 using Microsoft.EntityFrameworkCore;
 using Transaction.Database.Entities;
 using Transaction.Models;
@@ -8,10 +9,12 @@ namespace Transaction.Database.Repositories
     public class TransactionRepository : ITransactionRepository
     {
         private readonly TransactionsDbContext _dbContext;
+        private readonly CategoriesDbContext _dbContextCat;
         private readonly IMapper _mapper;
-        public TransactionRepository(TransactionsDbContext dbContext, IMapper mapper)
+        public TransactionRepository(TransactionsDbContext dbContext, CategoriesDbContext dbContextCat, IMapper mapper)
         {
             _dbContext = dbContext;
+            _dbContextCat = dbContextCat;
             _mapper = mapper;
         }
 
@@ -88,5 +91,76 @@ namespace Transaction.Database.Repositories
         {
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<List<AnalyticsResult>> GetAnalytics(string? catcode, DateTime? startDate, DateTime? endDate, string? direction)
+        {
+            var query = _dbContext.Transactions.AsQueryable();
+            var catWithParents = await _dbContextCat.Categories.Where(e => e.ParentCode != null && e.ParentCode!= "").ToListAsync();
+
+            if (startDate != null && (endDate != null))
+                query = query.Where(t => t.Date >= startDate && t.Date <= endDate);
+            else if (endDate != null)
+                query = query.Where(t => t.Date <= endDate);
+            else if (startDate != null)
+                query = query.Where(t => t.Date >= startDate);
+
+            if (direction != null && (direction == "d" || direction == "c"))
+            {
+                query = query.Where(t => t.Direction == (DirectionsEnum)Enum.Parse(typeof(DirectionsEnum), direction));
+            }
+
+            var toKeep = new List<string>();
+            if(!string.IsNullOrWhiteSpace(catcode))
+            {
+                var catValues = catcode.Split(',');
+                var enumValues = new List<string>();
+
+                foreach (var catSearchValue in catValues)
+                {
+                    var val = catSearchValue.Trim();
+                    enumValues.Add(val);
+                    toKeep.Add(val);
+                    //find all children
+                    var children = catWithParents.Where(c => c.ParentCode == val).Select(c => c.Code).ToList();
+                    enumValues.AddRange(children);
+                }
+                query = query.Where(t => enumValues.Contains(t.Catcode));
+            }
+
+            var query2 = await query.GroupBy(t => t.Catcode)
+                .Select(g => new AnalyticsResult
+                {
+                    CategoryCode = g.Key,
+                    Count = g.Count(),
+                    Sum = g.Sum(t => t.Amount)
+                }).ToListAsync();
+
+            
+
+            var joined = query2.Join(catWithParents, t => t.CategoryCode, c => c.Code, (t, c) => new AnalyticsResult
+            {
+                CategoryCode = c.ParentCode,
+                Count = t.Count,
+                Sum = t.Sum
+            }).Union(query2);
+
+            //sum count and sum for same category
+            joined = joined.GroupBy(t => t.CategoryCode)
+                .Select(g => new AnalyticsResult
+                {
+                    CategoryCode = g.Key,
+                    Count = g.Sum(t => t.Count),
+                    Sum = g.Sum(t => t.Sum)
+                });
+
+            //keep only toKeep
+            if(toKeep.Count > 0)
+            {
+                joined = joined.Where(t => toKeep.Contains(t.CategoryCode));
+            }
+            return joined.ToList();
+
+        }
+
     }
 }

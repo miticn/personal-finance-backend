@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Finance.Models;
+using Microsoft.AspNetCore.Mvc;
 using Transaction.Database.Entities;
 using Transaction.Models;
 
@@ -10,5 +11,6 @@ namespace Transaction.Database.Repositories
         Task<TransactionEntity> Get(string id);
         Task AddTransactionsAsync(List<Models.Transaction> transactions);
         Task SaveAsync();
+        Task<List<AnalyticsResult>> GetAnalytics(string? catcode, DateTime? startDate, DateTime? endDate, string? direction);
     }
 }
