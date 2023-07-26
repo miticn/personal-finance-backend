@@ -25,6 +25,8 @@ namespace Transaction
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+            builder.Services.AddScoped<ITransactionSplitRepository, TransactionSplitRepository>();
+
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             builder.Services.AddDbContext<TransactionsDbContext>(options =>

@@ -33,11 +33,9 @@ namespace Finance.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("ParentCode")
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.HasKey("Code");
-
-                    b.HasIndex("ParentCode");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -108,16 +106,6 @@ namespace Finance.Migrations
                     b.ToTable("TransactionSplits", (string)null);
                 });
 
-            modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
-                {
-                    b.HasOne("Finance.Models.CategoryEntity", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentCode")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>
                 {
                     b.HasOne("Finance.Models.CategoryEntity", "Category")
@@ -144,11 +132,6 @@ namespace Finance.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Transaction");
-                });
-
-            modelBuilder.Entity("Finance.Models.CategoryEntity", b =>
-                {
-                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Transaction.Database.Entities.TransactionEntity", b =>

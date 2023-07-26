@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Transaction.Database.Entities;
 using Transaction.Database.Repositories;
 using Transaction.Models;
 using Transaction.Services;
@@ -16,14 +17,17 @@ namespace Transaction.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly ITransactionSplitRepository _transactionSplitRepository;
         private readonly ILogger<TransactionController> _logger;
         private readonly ICategoryService _categoryService;
 
         public TransactionController(ITransactionService transactionService, ICategoryService categoryService,
-            ITransactionRepository transactionRepository, ILogger<TransactionController> logger)
+            ITransactionRepository transactionRepository, ITransactionSplitRepository transactionSplitRepository,
+            ILogger<TransactionController> logger)
         {
             _transactionService = transactionService;
             _categoryService = categoryService;
+            _transactionSplitRepository = transactionSplitRepository;
             _logger = logger;
             _transactionRepository = transactionRepository;
         }
@@ -92,16 +96,55 @@ namespace Transaction.Controllers
         }
 
         [HttpPost("{id}/split")]
-        public async Task<IActionResult> GetProduct([FromRoute] string id)
+        public async Task<IActionResult> TransactionSplit([FromRoute] string id, [FromBody] List<TransactionSplitCommand> splitCommands)
         {
-            var product = await _transactionService.GetTransaction(id);
-
-            if (product == null)
+            //get transaction
+            var transaction = await _transactionRepository.Get(id);
+            if (transaction == null)
             {
-                return NotFound();
+                return BadRequest("Transaction not found " + id);
             }
 
-            return Ok(product);
+            List<TransactionSplitEntity> splits = await _transactionSplitRepository.GetSplits(id);
+
+            if (splits.Count>0)
+            {
+                await _transactionSplitRepository.DeleteSplits(id);
+                await _transactionSplitRepository.SaveAsync();
+            }
+
+            double sum = 0;
+            //get splits from request body
+            var splitsToAdd = new List<TransactionSplit>();
+            foreach (var splitCMD in splitCommands)
+            {
+                splitsToAdd.Add(new TransactionSplit
+                {
+                    TransactionId = id,
+                    catcode = splitCMD.catcode,
+                    amount = splitCMD.amount
+                });
+                var categoryCheck = _categoryService.GetCategory(splitCMD.catcode);
+                if (categoryCheck==null)
+                {
+                    return BadRequest("Category not found "+ splitCMD.catcode);
+                }
+                sum += splitCMD.amount;
+            } 
+
+            if(sum != transaction.Amount)
+            {
+                return BadRequest("Sum of splits must be equal to transaction amount");
+            }
+            if(splitsToAdd.Count == 0)
+            {
+                return BadRequest("No splits provided");
+            }
+            //add splits to database
+            await _transactionSplitRepository.AddTransactionsAsync(splitsToAdd);
+            await _transactionSplitRepository.SaveAsync();
+
+            return Ok();
         }
     }
 }

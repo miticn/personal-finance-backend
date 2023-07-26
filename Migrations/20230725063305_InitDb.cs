@@ -14,18 +14,12 @@ namespace Finance.Migrations
                 columns: table => new
                 {
                     Code = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    ParentCode = table.Column<string>(type: "character varying(100)", nullable: true),
+                    ParentCode = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Code);
-                    table.ForeignKey(
-                        name: "FK_Categories_Categories_ParentCode",
-                        column: x => x.ParentCode,
-                        principalTable: "Categories",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,11 +71,6 @@ namespace Finance.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Categories_ParentCode",
-                table: "Categories",
-                column: "ParentCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_Catcode",

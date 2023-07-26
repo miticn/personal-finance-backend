@@ -15,6 +15,10 @@ namespace Transaction.Mappings
             CreateMap<CategoryEntity, Category>();
             CreateMap<Category, CategoryEntity>();
             CreateMap<PagedSortedList<CategoryEntity>, PagedSortedList<Category>>();
+            //CreateMap<TransactionSplitEntity, TransactionSplit>();
+            //CreateMap<TransactionSplit, TransactionSplitEntity>();
+            //CreateMap<List<TransactionSplitEntity>, List<TransactionSplit>>();
+
             //CreateMap<CreateProductCommand, TransactionEntity>()
             //   .ForMember(d => d.Code, opts => opts.MapFrom(s => s.ProductCode));
         }
