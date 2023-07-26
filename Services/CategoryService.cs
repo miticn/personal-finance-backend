@@ -19,9 +19,12 @@ namespace Finance.Services
             _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
-        public async Task<PagedSortedList<Category>> GetCategories(string parentId)
+        public async Task<List<Category>> GetCategories(string parentId)
         {
-            throw new NotImplementedException();
+            //get categories from db
+            var categories = await _categoryRepository.GetCategories(parentId);
+            var result = _mapper.Map<List<Category>>(categories);
+            return result;
         }
 
         public async Task ImportCategories(List<Category> categories)

@@ -18,6 +18,12 @@ namespace Finance.Controllers
             _categoryService = categoryService;
             _logger = logger;
         }
+        [HttpGet]
+        public async Task<IActionResult> GetCategories([FromQuery(Name = "parent-id")] string parentId)
+        {
+            var result = await _categoryService.GetCategories(parentId);
+            return Ok(result);
+        }
 
         [HttpPost("import"), Consumes("application/csv")]
         public async Task<ActionResult> ImportCategories()
@@ -30,7 +36,7 @@ namespace Finance.Controllers
                     var categories = await _categoryService.ParseCsv(csvData);
                     await _categoryService.ImportCategories(categories);
                 }
-                return Ok();
+                return Ok("Categories imported");
             }
             catch (Exception ex)
             {

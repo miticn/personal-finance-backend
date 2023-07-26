@@ -46,5 +46,17 @@ namespace Transaction.Database.Repositories
         {
             await _dbContext.SaveChangesAsync();
         }
+
+        public Task<List<CategoryEntity>> GetCategories(string? parentcode)
+        {
+            if(parentcode == null)
+            {
+                //get categories from db where parentcode is null
+                return _dbContext.Categories.Where(p => p.ParentCode == "").ToListAsync();
+            }
+            //get categories from db
+            var categories = _dbContext.Categories.Where(p => p.ParentCode == parentcode).ToListAsync();
+            return categories;
+        }
     }
 }

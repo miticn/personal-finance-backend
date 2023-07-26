@@ -1,0 +1,579 @@
+{
+	"info": {
+		"_postman_id": "e71a4423-7116-4108-9295-89ccf735c867",
+		"name": "Asseco",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28629421"
+	},
+	"item": [
+		{
+			"name": "Import transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/csv",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "transactions.csv"
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/transactions/import",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"transactions",
+						"import"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import category",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/csv",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "categories.csv"
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/categories/import",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"categories",
+						"import"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Categorize Transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is right\", function(){\r",
+							"    pm.response.to.have.body(\"Transaction categorized\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"catcode\": \"2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/transactions/10023191/categorize",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"transactions",
+						"10023191",
+						"categorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Spending analytics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Catcode is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.group).to.be.an('array');\r",
+							"\r",
+							"    responseData.group.forEach(function (item) {\r",
+							"        pm.expect(item.catcode).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Amount is a non-negative number\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.group).to.be.an('array');\r",
+							"\r",
+							"    responseData.group.forEach(function (item) {\r",
+							"        pm.expect(item.amount).to.be.a('number');\r",
+							"        pm.expect(item.amount).to.be.at.least(0);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Count is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.group).to.be.an('array');\r",
+							"\r",
+							"    responseData.group.forEach(function (item) {\r",
+							"        pm.expect(item.count).to.be.a('number');\r",
+							"        pm.expect(item.count).to.be.at.least(0);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7087/spending-analytics?catcode=1,B,2&start-date=01/12/2018&end-date=12/12/2022&direction=d",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"spending-analytics"
+					],
+					"query": [
+						{
+							"key": "catcode",
+							"value": "1,B,2"
+						},
+						{
+							"key": "start-date",
+							"value": "01/12/2018"
+						},
+						{
+							"key": "end-date",
+							"value": "12/12/2022"
+						},
+						{
+							"key": "direction",
+							"value": "d"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Split Transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is right\", function(){\r",
+							"    pm.response.to.have.body(\"Transaction splited\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"catcode\": \"1\",\r\n    \"amount\": 14\r\n  },\r\n  {\r\n    \"catcode\": \"2\",\r\n    \"amount\": 4.2\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/transactions/10023191/split",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"transactions",
+						"10023191",
+						"split"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Split Transaction2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is right\", function(){\r",
+							"    pm.response.to.have.body(\"Transaction splited\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"catcode\": \"1\",\r\n    \"amount\": 2412\r\n  },\r\n  {\r\n    \"catcode\": \"2\",\r\n    \"amount\": 20\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7087/transactions/60451717/split",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"transactions",
+						"60451717",
+						"split"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get categories",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is an array\", function () {\r",
+							"    pm.expect(pm.response.json()).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Each element in the array has a code, parentCode, and name\", function () {\r",
+							"    pm.response.json().forEach(function (category) {\r",
+							"        pm.expect(category).to.have.property('code');\r",
+							"        pm.expect(category).to.have.property('parentCode');\r",
+							"        pm.expect(category).to.have.property('name');\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7087/categories?parent-id=B",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"categories"
+					],
+					"query": [
+						{
+							"key": "parent-id",
+							"value": "B"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.totalCount).to.exist;\r",
+							"    pm.expect(responseData.pageSize).to.exist;\r",
+							"    pm.expect(responseData.page).to.exist;\r",
+							"    pm.expect(responseData.totalPages).to.exist;\r",
+							"    pm.expect(responseData.sortOrder).to.exist;\r",
+							"    pm.expect(responseData.sortBy).to.exist;\r",
+							"    pm.expect(responseData.items).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Validate id is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData.items).to.be.an('array');\r",
+							"    responseData.items.forEach(function (item) {\r",
+							"        pm.expect(item.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is exactly the same\", function () {\r",
+							"    const expectedResponse = {\r",
+							"    \"totalCount\": 36,\r",
+							"    \"pageSize\": 7,\r",
+							"    \"page\": 2,\r",
+							"    \"totalPages\": 0,\r",
+							"    \"sortOrder\": \"desc\",\r",
+							"    \"sortBy\": \"amount\",\r",
+							"    \"items\": [\r",
+							"        {\r",
+							"            \"id\": \"60451717\",\r",
+							"            \"beneficiaryName\": \"Asseco\",\r",
+							"            \"date\": \"2021-07-04T17:00:00-07:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 2432,\r",
+							"            \"description\": \"Salary\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"sal\",\r",
+							"            \"splits\": [\r",
+							"                {\r",
+							"                    \"catcode\": \"1\",\r",
+							"                    \"amount\": 2412\r",
+							"                },\r",
+							"                {\r",
+							"                    \"catcode\": \"2\",\r",
+							"                    \"amount\": 20\r",
+							"                }\r",
+							"            ]\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"58200155\",\r",
+							"            \"beneficiaryName\": \"Asseco\",\r",
+							"            \"date\": \"2021-01-16T16:00:00-08:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 2382.4,\r",
+							"            \"description\": \"Salary\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"sal\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"81106968\",\r",
+							"            \"beneficiaryName\": \"Asseco\",\r",
+							"            \"date\": \"2021-03-03T16:00:00-08:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 2376.5,\r",
+							"            \"description\": \"Salary\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"sal\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"84685491\",\r",
+							"            \"beneficiaryName\": \"Asseco\",\r",
+							"            \"date\": \"2021-10-01T17:00:00-07:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 2329.7,\r",
+							"            \"description\": \"Salary\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"sal\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"12211755\",\r",
+							"            \"beneficiaryName\": \"Asseco\",\r",
+							"            \"date\": \"2021-04-02T17:00:00-07:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 2313.3,\r",
+							"            \"description\": \"Salary\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"sal\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"80943502\",\r",
+							"            \"beneficiaryName\": \"Coinbase\",\r",
+							"            \"date\": \"2021-09-15T17:00:00-07:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 977.5,\r",
+							"            \"description\": \"Cryptocurrency sales\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"dep\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"id\": \"62811505\",\r",
+							"            \"beneficiaryName\": \"Coinbase\",\r",
+							"            \"date\": \"2021-01-18T16:00:00-08:00\",\r",
+							"            \"direction\": \"c\",\r",
+							"            \"amount\": 939.7,\r",
+							"            \"description\": \"Project based fee\",\r",
+							"            \"currency\": \"USD\",\r",
+							"            \"kind\": \"dep\"\r",
+							"        }\r",
+							"    ]\r",
+							"};\r",
+							"\r",
+							"    const actualResponse = pm.response.json();\r",
+							"\r",
+							"    pm.expect(actualResponse).to.eql(expectedResponse);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7087/transactions?transaction-kind=dep,sal&page=2&page-size=7&sort-order=desc&sort-by=amount&start-date=12/12/2020&end-date=11/12/2021",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7087",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "transaction-kind",
+							"value": "dep,sal"
+						},
+						{
+							"key": "page",
+							"value": "2"
+						},
+						{
+							"key": "page-size",
+							"value": "7"
+						},
+						{
+							"key": "sort-order",
+							"value": "desc"
+						},
+						{
+							"key": "sort-by",
+							"value": "amount"
+						},
+						{
+							"key": "start-date",
+							"value": "12/12/2020"
+						},
+						{
+							"key": "end-date",
+							"value": "11/12/2021"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

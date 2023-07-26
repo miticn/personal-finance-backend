@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transactions</title>
+    <style>
+        #transactions-table {
+            border-collapse: collapse;
+        }
+        #transactions-table th, 
+        #transactions-table td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    Transaction kind: <input id="transaction-kind" type="text" value="dep,sal"><br>
+    Page: <input id="page" type="number" value="2"><br>
+    Page size: <input id="page-size" type="number" value="7"><br>
+    Sort order: <input id="sort-order" type="text" value="desc"><br>
+    Sort by: <input id="sort-by" type="text" value="amount"><br>
+    Start date: <input id="start-date" type="date" value="2020-12-12"><br>
+    End date: <input id="end-date" type="date" value="2021-12-11"><br>
+
+    <table id="transactions-table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Beneficiary Name</th>
+                <th>Date</th>
+                <th>Direction</th>
+                <th>Amount</th>
+                <th>Currency</th>
+                <th>Kind</th>
+                <th>Split Marker</th>
+                <th>Description</th>
+				<th>Category Code</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+	<label for="transaction-id">Transaction ID:</label>
+	<select id="transaction-id"></select>
+	
+	<label for="category">Category:</label>
+    <select id="category"></select>
+
+    <label for="subcategory">Subcategory:</label>
+    <select id="subcategory"></select>
+
+    <button id="apply">Apply</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="main.js"></script>
+	<script src="category.js"></script>
+</body>
+</html>

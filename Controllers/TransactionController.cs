@@ -56,7 +56,7 @@ namespace Transaction.Controllers
                     var transactions = await _transactionService.ParseCsv(csvData);
                     await _transactionService.ImportTransactions(transactions);
                 }
-                return Ok();
+                return Ok("Transactions imported");
             }
             catch (Exception ex)
             {
@@ -147,7 +147,7 @@ namespace Transaction.Controllers
             transaction.Catcode = null;
             await _transactionRepository.SaveAsync();
 
-            return Ok();
+            return Ok("Transaction splited");
         }
     }
 }

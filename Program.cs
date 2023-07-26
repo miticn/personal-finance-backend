@@ -52,6 +52,13 @@ namespace Transaction
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(policy =>
+                policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+
+
             app.UseAuthorization();
 
             InitializeDatabase(app);
