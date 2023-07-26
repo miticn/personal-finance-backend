@@ -1,4 +1,5 @@
-﻿using Finance.Models;
+﻿using Finance.Commands;
+using Finance.Models;
 using Transaction.Models;
 
 namespace Transaction.Database.Entities

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Finance.Commands;
 using Finance.Models;
 using Microsoft.EntityFrameworkCore;
 using Transaction.Database.Entities;
@@ -21,7 +22,7 @@ namespace Transaction.Database.Repositories
             return await _dbContext.Transactions.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<PagedSortedList<TransactionEntity>> List(string transactionKind, DateTime? startDate, DateTime? endDate, string sortBy, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc)
+        public async Task<PagedSortedList<Models.Transaction>> List(string transactionKind, DateTime? startDate, DateTime? endDate, string sortBy, int page = 1, int pageSize = 10, SortOrder sortOrder = SortOrder.Asc)
         {
             var query = _dbContext.Transactions.AsQueryable();
 
@@ -66,15 +67,27 @@ namespace Transaction.Database.Repositories
             var totalItems = await query.CountAsync();
             var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            //convert to model
+            List<Models.Transaction> modelItems = items.Select(Models.Transaction.FromEntity).ToList();
 
-            return new PagedSortedList<TransactionEntity>
+            //add splits
+            foreach (var item in modelItems)
+            {
+                item.splits = await _dbContext.TransactionSplits.Where(s => s.TransactionId == item.Id).Select(s => new TransactionSplitCommand { catcode = s.catcode, amount = s.amount }).ToListAsync();
+                if(item.splits.Count == 0)
+                {
+                    item.splits = null;
+                }
+            }
+
+            return new PagedSortedList<Models.Transaction>
             {
                 PageSize = pageSize,
                 Page = page,
                 TotalCount = totalItems,
                 SortBy = sortBy,
                 SortOrder = sortOrder,
-                Items = items
+                Items = modelItems
             };
         }
 

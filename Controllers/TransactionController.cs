@@ -144,6 +144,9 @@ namespace Transaction.Controllers
             await _transactionSplitRepository.AddTransactionsAsync(splitsToAdd);
             await _transactionSplitRepository.SaveAsync();
 
+            transaction.Catcode = null;
+            await _transactionRepository.SaveAsync();
+
             return Ok();
         }
     }
